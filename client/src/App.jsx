@@ -69,7 +69,7 @@ const frontendPackingItemsBank = {
   ]
 };
 
-// Knowledge base for location recommendations based on trip type
+// Knowledge base for location recommendations based on Destination AND Trip Type
 const destinationAttractions = {
   nuwaraeliya: {
     "Hiking & Trekking": [
@@ -103,6 +103,10 @@ const destinationAttractions = {
     "Wellness & Relaxation": [
       { name: 'Royal Botanical Gardens (Peradeniya)', category: 'Nature Healing' },
       { name: 'Kandy Lake Sunset Walk', category: 'Calm Environment' }
+    ],
+    "Camping": [
+      { name: 'Udawatta Kele Forest Edge Campsite', category: 'Wild Camping' },
+      { name: 'Knuckles Mountain Range Base Camp (Kandy side)', category: 'Adventure Camping' }
     ]
   },
   ella: {
@@ -191,7 +195,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     return localStorage.getItem('isLoggedIn') === 'true' || location.pathname === '/dashboard';
   });
-  const [userEmail, setUserEmail] = useState(() => localStorage.getItem('userEmail') || 'user@zerowaste.lk');
+  const [userEmail, setUserEmail] = useState(() => localStorage.getItem('userEmail') || 'user@purejourney.lk');
   const [authMode, setAuthMode] = useState('login');
   const [showAuthModal, setShowAuthModal] = useState(false);
   
@@ -234,14 +238,10 @@ function App() {
     }
   };
 
-  // Frontend Default Items Loader for Complete Items Display
   const loadDefaultItems = async (type) => {
     try {
-      // Try fetching from backend first
       const response = await axios.get(`http://localhost:5000/api/items/${type}`);
       let fetched = response.data || [];
-      
-      // Fallback or blend with rich frontend list so ALL items are visible
       const presetItems = frontendPackingItemsBank[type] || frontendPackingItemsBank['Camping'];
       
       const combined = [...fetched];
@@ -356,7 +356,8 @@ function App() {
     return null;
   };
 
-  const getFilteredAttractions = (destName) => {
+  // Updated function to filter attractions based on BOTH Destination AND Trip Type
+  const getFilteredAttractions = (destName, currentTripType) => {
     if (!destName || !destName.trim()) return null;
     const destKey = destName.toLowerCase().replace(/[^a-z0-9]/g, '');
     let matchedPlaceKey = '';
@@ -370,20 +371,28 @@ function App() {
     }
 
     if (matchedPlaceKey && destinationAttractions[matchedPlaceKey]) {
+      const locationObj = destinationAttractions[matchedPlaceKey];
+      
+      // If specific trip type exists for this location, return those attractions
+      if (locationObj[currentTripType]) {
+        return locationObj[currentTripType];
+      }
+
+      // Otherwise, fallback to combining all attractions available for this destination
       let allPlaces = [];
-      const categories = destinationAttractions[matchedPlaceKey];
-      for (const cat in categories) {
-        allPlaces = allPlaces.concat(categories[cat]);
+      for (const cat in locationObj) {
+        allPlaces = allPlaces.concat(locationObj[cat]);
       }
       return allPlaces;
     }
 
+    // Default dynamic fallback if destination not explicitly pre-configured
     const capitalizedDest = destName.charAt(0).toUpperCase() + destName.slice(1);
     return [
+      { name: `${capitalizedDest} ${currentTripType} Spot & Main Area`, category: currentTripType },
       { name: `${capitalizedDest} Ancient Heritage & Historical Site`, category: 'Cultural & Heritage' },
       { name: `${capitalizedDest} Eco Nature Reserve & Park`, category: 'Nature & Wildlife' },
-      { name: `${capitalizedDest} Cultural Center & Local Village`, category: 'Religious & Spiritual' },
-      { name: `${capitalizedDest} Scenic Viewpoint & Lake Trail`, category: 'Hiking & Trekking' }
+      { name: `${capitalizedDest} Scenic Viewpoint & Trail`, category: 'Hiking & Trekking' }
     ];
   };
 
@@ -471,7 +480,7 @@ function App() {
     setItems(items.filter(item => item.id !== id));
   };
 
-  const liveAttractions = getFilteredAttractions(destination);
+  const liveAttractions = getFilteredAttractions(destination, tripType);
   const geoWarning = checkGeographicIncompatibility();
 
   return (
@@ -610,12 +619,12 @@ function App() {
                     </div>
                   )}
 
-                  {/* 4. Recommended Places & Map Preview */}
+                  {/* 4. Recommended Places (Filtered by Destination & Trip Type) & Map Preview */}
                   {liveAttractions && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '20px' }}>
                       <div style={{ background: '#f7fafc', padding: '20px', borderRadius: '16px', border: '1px solid #c6f6d5', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
                         <h4 style={{ color: '#1b5e20', margin: '0 0 14px 0', fontSize: '17px', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          📍 Recommended Visiting Places in <u>{destination}</u>:
+                          📍 Recommended <u>{tripType}</u> Places in <u>{destination}</u>:
                         </h4>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px' }}>
                           {liveAttractions.map((place, idx) => (
@@ -771,7 +780,7 @@ function App() {
                         <tr style={{ background: '#f7fafc', textAlign: 'left', color: '#4a5568' }}>
                           <th style={{ padding: '14px', borderBottom: '2px solid #e2e8f0', fontSize: '14px', fontWeight: '700' }}>ID</th>
                           <th style={{ padding: '14px', borderBottom: '2px solid #e2e8f0', fontSize: '14px', fontWeight: '700' }}>Destination</th>
-                          <th style={{ padding: '14px', borderBottom: '2px solid #e2e8f0', fontSize: '14px', fontWeight: '700' }}>Trip Type</th>
+                          <th style={{ padding: '14px', borderBottom: '2px solid #e2e8f0', fontSize: '14px', fontWeight: '700' }}>Trip Type & Style</th>
                           <th style={{ padding: '14px', borderBottom: '2px solid #e2e8f0', fontSize: '14px', fontWeight: '700' }}>Start Date</th>
                           <th style={{ padding: '14px', borderBottom: '2px solid #e2e8f0', fontSize: '14px', fontWeight: '700' }}>Budget</th>
                           <th style={{ padding: '14px', borderBottom: '2px solid #e2e8f0', fontSize: '14px', fontWeight: '700' }}>Transport</th>
@@ -841,7 +850,7 @@ function App() {
                     width: '100%', 
                     padding: '12px', 
                     borderRadius: '10px', 
-                    border: `1px solid ${authMode === 'register' && passwordInput.length > 0 && !isPasswordValid ? '#e53935' : '#cbd5e0'}`, 
+                    border: `1px solid ${authMode === 'register' && passwordInput.Title > 0 && !isPasswordValid ? '#e53935' : '#cbd5e0'}`, 
                     fontSize: '15px', 
                     boxSizing: 'border-box' 
                   }} 
@@ -890,7 +899,7 @@ function App() {
 
       {/* Footer */}
       <footer style={{ background: '#0a1d0b', color: '#8fa891', textAlign: 'center', padding: '30px 20px', marginTop: 'auto', width: '100%' }}>
-        <p style={{ margin: '0 0 8px 0', fontWeight: '700', fontSize: '15px', color: '#ffffff' }}>🌱 ZeroWaste Trip Planner — Protect Nature, Travel Responsibly.</p>
+        <p style={{ margin: '0 0 8px 0', fontWeight: '700', fontSize: '15px', color: '#ffffff' }}>🌱 Pure Journey — Protect Nature, Travel Responsibly.</p>
         <p style={{ margin: 0, fontSize: '13px', color: '#668068' }}>© 2026 All Rights Reserved. Built with React, Node.js & MySQL.</p>
       </footer>
 
