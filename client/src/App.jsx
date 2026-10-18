@@ -496,7 +496,7 @@ function App() {
       }}>
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '28px', fontWeight: '900', color: '#ffffff', textDecoration: 'none', letterSpacing: '-0.5px' }}>
           <img src={logoImg} alt="Logo" style={{ width: '58px', height: '58px', borderRadius: '14px', objectFit: 'cover', border: '2px solid #ffffff', boxShadow: '0 3px 10px rgba(0,0,0,0.3)' }} />
-          <span>ZeroWaste <span style={{ color: '#a5d6a7', fontWeight: '700', fontSize: '20px' }}>Trip Planner</span></span>
+          <span>Pure <span style={{ color: '#a5d6a7', fontWeight: '700', fontSize: '20px' }}>Journey</span></span>
         </Link>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '25px' }}>
@@ -549,9 +549,7 @@ function App() {
                     Travel Green, <br />
                     <span style={{ color: '#a5d6a7', fontStyle: 'italic' }}>Leave No Plastic Behind.</span>
                   </h1>
-                  <p style={{ fontSize: '18px', lineHeight: '1.6', color: '#f1f8e9', marginBottom: '32px', fontWeight: '500' }}>
-                    Plan eco-friendly journeys, reduce single-use plastic waste, and create custom sustainable packing checklists effortlessly!
-                  </p>
+                  <p style={{ margin: '0 0 8px 0', fontWeight: '700', fontSize: '15px', color: '#ffffff' }}>🌱 Pure Journey — Protect Nature, Travel Responsibly.</p>
                   <button onClick={() => { if(isLoggedIn) navigate('/dashboard'); else setShowAuthModal(true); }} style={{ background: 'linear-gradient(135deg, #43a047 0%, #1b5e20 100%)', color: 'white', border: '1px solid rgba(255,255,255,0.4)', padding: '16px 42px', borderRadius: '35px', fontSize: '17px', fontWeight: '800', cursor: 'pointer', boxShadow: '0 8px 25px rgba(0,0,0,0.4)' }}>
                     {isLoggedIn ? 'Explore Dashboard 🚀' : 'Start Planning Free 🌱'}
                   </button>
