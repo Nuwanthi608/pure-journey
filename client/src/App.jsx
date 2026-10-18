@@ -32,7 +32,6 @@ const packingCategoriesList = [
   "Emergency Contacts", "Travel Checklists", "Miscellaneous"
 ];
 
-// Rich Frontend Default Items Bank for selected Trip Types
 const frontendPackingItemsBank = {
   Camping: [
     { id: 'c1', item_name: "Eco-Friendly Camping Tent", category: "Shelter" },
@@ -69,7 +68,6 @@ const frontendPackingItemsBank = {
   ]
 };
 
-// Knowledge base for location recommendations based on Destination AND Trip Type
 const destinationAttractions = {
   nuwaraeliya: {
     "Hiking & Trekking": [
@@ -135,57 +133,18 @@ const destinationAttractions = {
 };
 
 const tripTypesList = [
-  "Adventure",
-  "Beach Vacation",
-  "Nature & Wildlife",
-  "Cultural & Heritage",
-  "Family Trip",
-  "Solo Travel",
-  "Friends Trip",
-  "Road Trip",
-  "Camping",
-  "Hiking & Trekking",
-  "City Exploration",
-  "Religious & Spiritual",
-  "Food & Culinary",
-  "Photography Trip",
-  "Wellness & Relaxation",
-  "Romantic Getaway",
-  "Educational Trip",
-  "Business Travel",
-  "Eco Tourism",
-  "Budget-Friendly Travel",
-  "Luxury Travel",
-  "Backpacking",
-  "Group Travel",
-  "Slow Travel",
-  "Eco-Friendly Travel",
-  "Off-the-Beaten-Path",
-  "Wildlife Safari",
-  "Island Hopping",
-  "Cruise Travel"
+  "Adventure", "Beach Vacation", "Nature & Wildlife", "Cultural & Heritage", "Family Trip", 
+  "Solo Travel", "Friends Trip", "Road Trip", "Camping", "Hiking & Trekking", "City Exploration", 
+  "Religious & Spiritual", "Food & Culinary", "Photography Trip", "Wellness & Relaxation", 
+  "Romantic Getaway", "Educational Trip", "Business Travel", "Eco Tourism", "Budget-Friendly Travel", 
+  "Luxury Travel", "Backpacking", "Group Travel", "Slow Travel", "Eco-Friendly Travel", 
+  "Off-the-Beaten-Path", "Wildlife Safari", "Island Hopping", "Cruise Travel"
 ];
 
 const transportTypesList = [
-  "Car",
-  "Van",
-  "Bus",
-  "Train",
-  "Tuk-Tuk",
-  "Motorcycle",
-  "Bicycle",
-  "Scooter",
-  "Three-Wheeler",
-  "Taxi",
-  "Private Driver",
-  "Tourist Bus",
-  "Minibus",
-  "Public Transit",
-  "Jeep",
-  "Bicycle Rental",
-  "Boat",
-  "Walking",
-  "Ride-Sharing Service"
+  "Car", "Van", "Bus", "Train", "Tuk-Tuk", "Motorcycle", "Bicycle", "Scooter", 
+  "Three-Wheeler", "Taxi", "Private Driver", "Tourist Bus", "Minibus", "Public Transit", 
+  "Jeep", "Bicycle Rental", "Boat", "Walking", "Ride-Sharing Service"
 ];
 
 function App() {
@@ -212,7 +171,6 @@ function App() {
   const [transportMode, setTransportMode] = useState('Train');
 
   const [generatedTrip, setGeneratedTrip] = useState(null);
-
   const [items, setItems] = useState([]);
   const [plasticEstimate, setPlasticEstimate] = useState(0);
   const [tripsHistory, setTripsHistory] = useState([]);
@@ -254,7 +212,6 @@ function App() {
       const itemsWithCheck = combined.map(item => ({ ...item, checked: false }));
       setItems(itemsWithCheck);
     } catch (err) {
-      console.error('Error loading items, using fallback:', err);
       const fallbackList = frontendPackingItemsBank[type] || frontendPackingItemsBank['Camping'];
       setItems(fallbackList.map(item => ({ ...item, checked: false })));
     }
@@ -268,7 +225,6 @@ function App() {
 
   const handleAuthSubmit = async (e) => {
     e.preventDefault();
-
     if (authMode === 'register' && !isPasswordValid) {
       alert('⚠️ Password violates the rules. Maximum length is 5 characters (Capital + Simple letters only).');
       return;
@@ -345,18 +301,15 @@ function App() {
   const checkGeographicIncompatibility = () => {
     if (!destination || !destination.trim()) return null;
     const destLower = destination.toLowerCase();
-    
     const isLandlocked = inlandLandlockedDestinations.some(place => destLower.includes(place));
     const isCoastalTrip = coastalTripTypes.includes(tripType);
 
     if (isLandlocked && isCoastalTrip) {
       return `⚠️ Note: "${destination}" is an inland/mountainous region and does not have a coastline for "${tripType}". We recommend selecting Nature, Cultural, Hiking, or Wellness trips for this area!`;
     }
-
     return null;
   };
 
-  // Updated function to filter attractions based on BOTH Destination AND Trip Type
   const getFilteredAttractions = (destName, currentTripType) => {
     if (!destName || !destName.trim()) return null;
     const destKey = destName.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -372,13 +325,8 @@ function App() {
 
     if (matchedPlaceKey && destinationAttractions[matchedPlaceKey]) {
       const locationObj = destinationAttractions[matchedPlaceKey];
-      
-      // If specific trip type exists for this location, return those attractions
-      if (locationObj[currentTripType]) {
-        return locationObj[currentTripType];
-      }
+      if (locationObj[currentTripType]) return locationObj[currentTripType];
 
-      // Otherwise, fallback to combining all attractions available for this destination
       let allPlaces = [];
       for (const cat in locationObj) {
         allPlaces = allPlaces.concat(locationObj[cat]);
@@ -386,7 +334,6 @@ function App() {
       return allPlaces;
     }
 
-    // Default dynamic fallback if destination not explicitly pre-configured
     const capitalizedDest = destName.charAt(0).toUpperCase() + destName.slice(1);
     return [
       { name: `${capitalizedDest} ${currentTripType} Spot & Main Area`, category: currentTripType },
@@ -428,11 +375,7 @@ function App() {
       });
 
       fetchTripsHistory();
-
-      setTimeout(() => {
-        scrollToSection('results-section');
-      }, 100);
-
+      setTimeout(() => { scrollToSection('results-section'); }, 100);
     } catch (err) {
       console.error('Error generating trip:', err);
       alert('Failed to connect to backend server.');
@@ -462,7 +405,7 @@ function App() {
         item_type: tripType
       });
     } catch (err) {
-      console.log('Saved to state (offline/fallback mode)');
+      console.log('Saved to state');
     }
 
     setItems([...items, newItem]);
@@ -493,23 +436,28 @@ function App() {
         left: 0, 
         right: 0, 
         zIndex: 99999, 
-        background: '#1b5e20', 
-        padding: '16px 70px', 
+        background: 'linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%)', 
+        padding: '16px 60px', 
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'center', 
-        height: '100px', 
+        height: '95px', 
         boxSizing: 'border-box',
-        boxShadow: '0 6px 24px rgba(0, 0, 0, 0.2)',
-        borderBottom: '4px solid #81c784'
+        boxShadow: '0 8px 30px rgba(0, 0, 0, 0.25)',
+        borderBottom: '3px solid #81c784'
       }}>
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '28px', fontWeight: '900', color: '#ffffff', textDecoration: 'none', letterSpacing: '-0.5px' }}>
-          <img src={logoImg} alt="Logo" style={{ width: '58px', height: '58px', borderRadius: '14px', objectFit: 'cover', border: '2px solid #ffffff', boxShadow: '0 3px 10px rgba(0,0,0,0.3)' }} />
-          <span>Pure <span style={{ color: '#a5d6a7', fontWeight: '700', fontSize: '20px' }}>Journey</span></span>
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '16px', textDecoration: 'none' }}>
+          <img src={logoImg} alt="Logo" style={{ width: '62px', height: '62px', borderRadius: '16px', objectFit: 'cover', border: '3px solid #ffffff', boxShadow: '0 4px 14px rgba(0,0,0,0.35)' }} />
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span style={{ fontSize: '28px', fontWeight: '900', color: '#ffffff', letterSpacing: '-0.5px', textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+              Pure <span style={{ color: '#a5d6a7', fontWeight: '800' }}>Journey</span>
+            </span>
+            <span style={{ fontSize: '11px', fontWeight: '700', color: '#c8e6c9', letterSpacing: '1.5px', textTransform: 'uppercase' }}>Sustainable Travel Planner</span>
+          </div>
         </Link>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '25px' }}>
-          <Link to="/" style={{ color: location.pathname === '/' ? '#a5d6a7' : '#ffffff', textDecoration: 'none', fontWeight: '800', fontSize: '16px', transition: 'all 0.2s' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
+          <Link to="/" style={{ color: location.pathname === '/' ? '#a5d6a7' : '#ffffff', textDecoration: 'none', fontWeight: '800', fontSize: '16px', transition: 'all 0.2s', textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>
             Home
           </Link>
 
@@ -520,12 +468,12 @@ function App() {
               <span onClick={() => scrollToSection('itinerary-section')} style={{ color: '#ffffff', cursor: 'pointer', fontWeight: '800', fontSize: '16px' }}>AI Itinerary</span>
               <span onClick={() => scrollToSection('packing-section')} style={{ color: '#ffffff', cursor: 'pointer', fontWeight: '800', fontSize: '16px' }}>Packing List</span>
               <span onClick={() => scrollToSection('history-section')} style={{ color: '#ffffff', cursor: 'pointer', fontWeight: '800', fontSize: '16px' }}>History</span>
-              <button onClick={handleLogout} style={{ background: '#e53935', color: 'white', border: 'none', padding: '10px 22px', borderRadius: '30px', cursor: 'pointer', fontWeight: '800', fontSize: '15px', boxShadow: '0 4px 14px rgba(229,57,53,0.3)' }}>
+              <button onClick={handleLogout} style={{ background: '#e53935', color: 'white', border: 'none', padding: '11px 24px', borderRadius: '30px', cursor: 'pointer', fontWeight: '800', fontSize: '15px', boxShadow: '0 4px 14px rgba(229,57,53,0.4)', transition: 'transform 0.2s' }}>
                 Logout
               </button>
             </>
           ) : (
-            <button onClick={() => setShowAuthModal(true)} style={{ background: '#2e7d32', color: 'white', border: '2px solid #ffffff', padding: '12px 30px', borderRadius: '30px', fontWeight: '800', fontSize: '17px', cursor: 'pointer', boxShadow: '0 6px 18px rgba(0,0,0,0.2)' }}>
+            <button onClick={() => setShowAuthModal(true)} style={{ background: 'linear-gradient(135deg, #43a047 0%, #2e7d32 100%)', color: 'white', border: '2px solid #ffffff', padding: '12px 32px', borderRadius: '30px', fontWeight: '900', fontSize: '17px', cursor: 'pointer', boxShadow: '0 6px 20px rgba(0,0,0,0.3)', transition: 'transform 0.2s' }}>
               Get Started 🌱
             </button>
           )}
@@ -533,33 +481,54 @@ function App() {
       </nav>
 
       {/* Main Content Area */}
-      <div style={{ marginTop: '80px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ marginTop: '95px', flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Routes>
           <Route path="/" element={
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
               <div style={{ 
                 width: '100%', 
-                minHeight: '85vh', 
-                backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.3)), url(${homeBgImg})`, 
+                minHeight: '88vh', 
+                backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.35)), url(${homeBgImg})`, 
                 backgroundSize: 'cover', 
                 backgroundPosition: 'center', 
                 display: 'flex', 
                 flexDirection: 'row',
-                justifyContent: 'flex-end',
+                justifyContent: 'flex-start',
                 alignItems: 'center',
-                padding: '80px 80px 80px 40px', 
+                padding: '80px 80px', 
                 boxSizing: 'border-box'
               }}>
-                <div style={{ maxWidth: '620px', textAlign: 'left', color: '#ffffff', textShadow: '0 3px 12px rgba(0,0,0,0.85)', background: 'rgba(15, 36, 16, 0.65)', padding: '40px', borderRadius: '24px', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.2)' }}>
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#2e7d32', padding: '8px 20px', borderRadius: '30px', fontSize: '13px', fontWeight: '800', color: '#ffffff', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '22px', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
+                {/* Clean Hero Layout without dark box background */}
+                <div style={{ 
+                  maxWidth: '580px', 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'flex-start',
+                  textAlign: 'left', 
+                  color: '#ffffff', 
+                  textShadow: '0 4px 18px rgba(0, 0, 0, 0.9)'
+                }}>
+                  {/* Badge */}
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#2e7d32', padding: '8px 20px', borderRadius: '30px', fontSize: '12px', fontWeight: '900', color: '#ffffff', textTransform: 'uppercase', letterSpacing: '1.2px', marginBottom: '22px', boxShadow: '0 4px 15px rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.2)' }}>
                     🌿 EMPOWERING ENVIRONMENTAL CONSERVATION
                   </div>
-                  <h1 style={{ fontSize: '52px', fontWeight: '900', lineHeight: '1.15', margin: '0 0 20px 0', letterSpacing: '-1.5px', color: '#ffffff' }}>
+
+                  {/* Main Tagline */}
+                  <h1 style={{ fontSize: '58px', fontWeight: '900', lineHeight: '1.12', margin: '0 0 18px 0', letterSpacing: '-1.5px', color: '#ffffff' }}>
                     Travel Green, <br />
                     <span style={{ color: '#a5d6a7', fontStyle: 'italic' }}>Leave No Plastic Behind.</span>
                   </h1>
-                  <p style={{ margin: '0 0 8px 0', fontWeight: '700', fontSize: '15px', color: '#ffffff' }}>🌱 Pure Journey — Protect Nature, Travel Responsibly.</p>
-                  <button onClick={() => { if(isLoggedIn) navigate('/dashboard'); else setShowAuthModal(true); }} style={{ background: 'linear-gradient(135deg, #43a047 0%, #1b5e20 100%)', color: 'white', border: '1px solid rgba(255,255,255,0.4)', padding: '16px 42px', borderRadius: '35px', fontSize: '17px', fontWeight: '800', cursor: 'pointer', boxShadow: '0 8px 25px rgba(0,0,0,0.4)' }}>
+
+                  {/* Highlighted Project Title */}
+                  <div style={{ margin: '0 0 28px 0', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    
+                    <span style={{ fontSize: '18px', fontWeight: '700', color: '#ffffff' }}>
+                      🌱 Protect Nature, Travel Responsibly.
+                    </span>
+                  </div>
+
+                  {/* CTA Button */}
+                  <button onClick={() => { if(isLoggedIn) navigate('/dashboard'); else setShowAuthModal(true); }} style={{ background: 'linear-gradient(135deg, #43a047 0%, #1b5e20 100%)', color: 'white', border: '1px solid rgba(255,255,255,0.6)', padding: '16px 42px', borderRadius: '35px', fontSize: '18px', fontWeight: '900', cursor: 'pointer', boxShadow: '0 8px 25px rgba(0,0,0,0.5)' }}>
                     {isLoggedIn ? 'Explore Dashboard 🚀' : 'Start Planning Free 🌱'}
                   </button>
                 </div>
@@ -619,7 +588,7 @@ function App() {
                     </div>
                   )}
 
-                  {/* 4. Recommended Places (Filtered by Destination & Trip Type) & Map Preview */}
+                  {/* 4. Recommended Places & Map Preview */}
                   {liveAttractions && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '20px' }}>
                       <div style={{ background: '#f7fafc', padding: '20px', borderRadius: '16px', border: '1px solid #c6f6d5', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
@@ -850,7 +819,7 @@ function App() {
                     width: '100%', 
                     padding: '12px', 
                     borderRadius: '10px', 
-                    border: `1px solid ${authMode === 'register' && passwordInput.Title > 0 && !isPasswordValid ? '#e53935' : '#cbd5e0'}`, 
+                    border: `1px solid ${authMode === 'register' && passwordInput.length > 0 && !isPasswordValid ? '#e53935' : '#cbd5e0'}`, 
                     fontSize: '15px', 
                     boxSizing: 'border-box' 
                   }} 
